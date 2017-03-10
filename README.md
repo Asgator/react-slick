@@ -32,7 +32,7 @@ or add cdn link in your html
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css" />
 ```
 
-### [Demos](http://webrafter.com/opensource/react-slick)
+### [Demos](http://neostack.com/opensource/react-slick)
 
 ### [PlayGround](https://jsfiddle.net/kirana/20bumb4g/)
 Use [jsfiddle template](https://jsfiddle.net/kirana/20bumb4g/) to try react-slick with different settings.
@@ -80,8 +80,8 @@ var SimpleSlider = React.createClass({
 | className      | String |Additional class name for the inner slider div | Yes |
 | adaptiveHeight | bool | Adjust the slide's height automatically | Yes |
 | arrows         | bool | Should we show Left and right nav arrows | Yes |
-| nextArrow      | React Component | Use this component for the next arrow button | Yes |
-| prevArrow      | React Component | Use this component for the prev arrow button | Yes |
+| nextArrow      | React Element | Use this element for the next arrow button | Yes |
+| prevArrow      | React Element | Use this element for the prev arrow button | Yes |
 | autoplay       | bool | Should the scroller auto scroll? | Yes |
 | autoplaySpeed  |  int | delay between each auto scoll. in ms | Yes |
 | centerMode     | bool | Should we centre to a single item? | Yes |
@@ -118,9 +118,9 @@ var SimpleSlider = React.createClass({
 
 
 ### Methods
-* slickNext()   - function called to change current slide on next slide ([Example](https://github.com/akiran/react-slick/blob/master/examples/PreviousNextMethods.js))
-* slickPrev()   - function called to change current slide on previous slide ([Example](https://github.com/akiran/react-slick/blob/master/examples/PreviousNextMethods.js))
-* slickGoTo(slideNumber) - function called to change current slide to given slide number ([Example](https://github.com/akiran/react-slick/blob/master/examples/SlickGoTo.js))
+* `slickNext()`   - function called to change current slide on next slide ([Example](https://github.com/akiran/react-slick/blob/master/examples/PreviousNextMethods.js))
+* `slickPrev()`   - function called to change current slide on previous slide ([Example](https://github.com/akiran/react-slick/blob/master/examples/PreviousNextMethods.js))
+* `slickGoTo(slideNumber)` - function called to change current slide to given slide number ([Example](https://github.com/akiran/react-slick/blob/master/examples/SlickGoTo.js))
 
 ### Custom next/prev arrows
 
@@ -130,7 +130,7 @@ as the values of nextArrow and prevArrow.
 ```js
 class LeftNavButton extends React.Component {
   render() {
-    return <button {...this.props}>Next</button>  
+    return <button {...this.props}>Next</button>
   }
 }
 ```
@@ -138,21 +138,46 @@ class LeftNavButton extends React.Component {
 Important: be sure that you pass your component's props to your clickable element
 like the example above. If you don't, your custom component won't trigger the click handler.
 
-You can also set onClick={this.props.onClick} if you only want to set the click handler. 
+You can also set `onClick={this.props.onClick}` if you only want to set the click handler.
 
-### Flexbox support 
+### Flexbox support
 If you have flex property on container div of slider, add below css
-```
+```css
 * {
   min-height: 0;
   min-width: 0;
 }
 ```
 
+### Test Setup
+If you try to run tests with jest in a project that uses react-slick, you my run into this error
+```
+matchMedia not present, legacy browsers require a polyfill
+```
+
+To fix this issue add below snippet in test-setup.js
+```js
+window.matchMedia = window.matchMedia || function() {
+    return {
+        matches : false,
+        addListener : function() {},
+        removeListener: function() {}
+    };
+};
+
+```
+and add below jest config in package.json
+```json
+"jest": {
+    "setupFiles": ["test-setup.js"]
+}
+```
+
+
 ### Development
 Want to run demos locally
 
-```shell
+```bash
 git clone https://github.com/akiran/react-slick
 npm install
 npm start
@@ -162,5 +187,3 @@ open http://localhost:8080
 ### Polyfills for old IE support
 `matchMedia` support from [media-match](https://github.com/weblinc/media-match)
 
-For premium support, contact me on codementor
-[![Contact me on Codementor](https://cdn.codementor.io/badges/contact_me_github.svg)](https://www.codementor.io/akiran?utm_source=github&utm_medium=button&utm_term=akiran&utm_campaign=github)

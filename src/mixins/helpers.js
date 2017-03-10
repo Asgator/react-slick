@@ -15,7 +15,8 @@ var helpers = {
     var slideWidth;
 
     if (!props.vertical) {
-      slideWidth = this.getWidth(ReactDOM.findDOMNode(this))/props.slidesToShow;
+      var centerPaddingAdj = props.centerMode && (parseInt(props.centerPadding) * 2);
+      slideWidth = (this.getWidth(ReactDOM.findDOMNode(this)) - centerPaddingAdj)/props.slidesToShow;
     } else {
       slideWidth = this.getWidth(ReactDOM.findDOMNode(this));
     }
@@ -57,7 +58,8 @@ var helpers = {
     var slideWidth;
 
     if (!props.vertical) {
-      slideWidth = this.getWidth(ReactDOM.findDOMNode(this))/props.slidesToShow;
+      var centerPaddingAdj = props.centerMode && (parseInt(props.centerPadding) * 2);
+      slideWidth = (this.getWidth(ReactDOM.findDOMNode(this)) - centerPaddingAdj)/props.slidesToShow;
     } else {
       slideWidth = this.getWidth(ReactDOM.findDOMNode(this));
     }
@@ -66,8 +68,11 @@ var helpers = {
     const listHeight = slideHeight * props.slidesToShow;
 
     // pause slider if autoplay is set to false
-    if(!props.autoplay)
+    if(props.autoplay) {
       this.pause();
+    } else {
+      this.autoPlay();
+    }
 
     this.setState({
       slideCount,
@@ -89,10 +94,10 @@ var helpers = {
     });
   },
   getWidth: function getWidth(elem) {
-    return elem.getBoundingClientRect().width || elem.offsetWidth;
+    return elem.getBoundingClientRect().width || elem.offsetWidth || 0;
   },
   getHeight(elem) {
-    return elem.getBoundingClientRect().height || elem.offsetHeight;
+    return elem.getBoundingClientRect().height || elem.offsetHeight || 0;
   },
   adaptHeight: function () {
     if (this.props.adaptiveHeight) {
@@ -102,6 +107,24 @@ var helpers = {
         slickList.style.height = slickList.querySelector(selector).offsetHeight + 'px';
       }
     }
+  },
+  canGoNext: function (opts){
+    var canGo = true;
+    if (!opts.infinite) {
+      if (opts.centerMode) {
+        // check if current slide is last slide
+        if (opts.currentSlide >= (opts.slideCount - 1)) {
+          canGo = false;
+        }
+      } else {
+        // check if all slides are shown in slider
+        if (opts.slideCount <= opts.slidesToShow ||
+          opts.currentSlide >= (opts.slideCount - opts.slidesToShow)) {
+          canGo = false;
+        }
+      }
+    }
+    return canGo;
   },
   setItemLazyList: function(list, item) {
     if (list.indexOf(item) == -1) {
@@ -134,7 +157,7 @@ var helpers = {
 
       if (currentDistance > listLength) {
         this.setItemLazyList(lazyLoadedList, 0 + (currentDistance - listLength - 1))
-        
+
         continue;
       }
 
@@ -161,7 +184,7 @@ var helpers = {
       if(this.props.infinite === false &&
         (index < 0 || index >= this.state.slideCount)) {
         return;
-      } 
+      }
 
       //  Shifting targetSlide back into the range
       if (index < 0) {
@@ -324,27 +347,38 @@ var helpers = {
 
     return 'vertical';
   },
+  play: function(){
+    var nextIndex;
+
+    if (!this.state.mounted) {
+      return false
+    }
+
+    if (this.props.rtl) {
+      nextIndex = this.state.currentSlide - this.props.slidesToScroll;
+    } else {
+      if (this.canGoNext(Object.assign({}, this.props,this.state))) {
+        nextIndex = this.state.currentSlide + this.props.slidesToScroll;
+      } else {
+        return false;
+      }
+    }
+
+    this.slideHandler(nextIndex);
+  },
   autoPlay: function () {
     if (this.state.autoPlayTimer) {
-      return;
+      clearTimeout(this.state.autoPlayTimer);
     }
-    var play = () => {
-      if (this.state.mounted) {
-        var nextIndex = this.props.rtl ?
-        this.state.currentSlide - this.props.slidesToScroll:
-        this.state.currentSlide + this.props.slidesToScroll;
-        this.slideHandler(nextIndex);
-      }
-    };
     if (this.props.autoplay) {
       this.setState({
-        autoPlayTimer: setInterval(play, this.props.autoplaySpeed)
+        autoPlayTimer: setTimeout(this.play, this.props.autoplaySpeed)
       });
     }
   },
   pause: function () {
     if (this.state.autoPlayTimer) {
-      clearInterval(this.state.autoPlayTimer);
+      clearTimeout(this.state.autoPlayTimer);
       this.setState({
         autoPlayTimer: null
       });

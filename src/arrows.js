@@ -2,6 +2,7 @@
 
 import React from 'react';
 import classnames from 'classnames';
+import Helpers from './mixins/helpers';
 
 export var PrevArrow = React.createClass({
 
@@ -22,6 +23,8 @@ export var PrevArrow = React.createClass({
       key: '0',
       'data-role': 'none',
       className: classnames(prevClasses),
+      currentSlide: this.props.currentSlide,
+      slideCount: this.props.slideCount,
       style: {display: 'block'},
       onClick: prevHandler
     };
@@ -47,28 +50,17 @@ export var NextArrow = React.createClass({
     var nextClasses = {'slick-arrow': true, 'slick-next': true};
     var nextHandler = this.clickHandler.bind(this, {message: 'next'});
 
-    if (!this.props.infinite) {
-      if (this.props.centerMode) {
-        // check if current slide is last slide
-        if (this.props.currentSlide >= (this.props.slideCount - 1)) {
-          nextClasses['slick-disabled'] = true;
-          nextHandler = null;
-        }
-      } else {
-        // check if all slides are shown in slider
-        if (this.props.slideCount <= this.props.slidesToShow ||
-          this.props.currentSlide >= (this.props.slideCount - this.props.slidesToShow)) {
-          nextClasses['slick-disabled'] = true;
-          nextHandler = null;
-        }
-      }
+    if (!Helpers.canGoNext(this.props)) {
+      nextClasses['slick-disabled'] = true;
+      nextHandler = null;
     }
-
 
     var nextArrowProps = {
       key: '1',
       'data-role': 'none',
       className: classnames(nextClasses),
+      currentSlide: this.props.currentSlide,
+      slideCount: this.props.slideCount,
       style: {display: 'block'},
       onClick: nextHandler
     };

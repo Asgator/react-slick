@@ -116,7 +116,9 @@ export var InnerSlider = React.createClass({
     // animating state should be cleared while resizing, otherwise autoplay stops working
     this.setState({
       animating: false
-    })
+    });
+    clearTimeout(this.animationEndCallback);
+    delete this.animationEndCallback;
   },
   slickPrev: function () {
     this.changeSlide({message: 'previous'});
@@ -217,7 +219,12 @@ export var InnerSlider = React.createClass({
     const listStyle = assign({}, verticalHeightStyle, centerPaddingStyle);
 
     return (
-      <div className={className} onMouseEnter={this.onInnerSliderEnter} onMouseLeave={this.onInnerSliderLeave}>
+      <div
+        className={className}
+        onMouseEnter={this.onInnerSliderEnter}
+        onMouseLeave={this.onInnerSliderLeave}
+        onMouseOver={this.onInnerSliderOver}
+      >
         {prevArrow}
         <div
           ref={this.listRefHandler}

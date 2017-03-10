@@ -41,7 +41,7 @@ var EventHandlers = {
 
     this.slideHandler(targetSlide);
   },
- 
+
   // Accessiblity handler for previous and next
   keyHandler: function (e) {
     //Dont slide if the cursor is inside the form fields and arrow keys are pressed
@@ -88,6 +88,9 @@ var EventHandlers = {
     }
     if (this.state.animating) {
       return;
+    }
+    if (this.props.vertical && this.props.swipeToSlide && this.props.verticalSwiping) {
+      e.preventDefault();
     }
     var swipeLeft;
     var curLeft, positionOffset;
@@ -232,7 +235,9 @@ var EventHandlers = {
   },
   swipeEnd: function (e) {
     if (!this.state.dragging) {
-      e.preventDefault();
+      if (this.props.swipe) {
+        e.preventDefault();
+      }
       return;
     }
     var touchObject = this.state.touchObject;
@@ -295,6 +300,11 @@ var EventHandlers = {
     }
   },
   onInnerSliderEnter: function (e) {
+    if (this.props.autoplay && this.props.pauseOnHover) {
+      this.pause();
+    }
+  },
+  onInnerSliderOver: function (e) {
     if (this.props.autoplay && this.props.pauseOnHover) {
       this.pause();
     }
